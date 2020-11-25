@@ -1,4 +1,4 @@
-﻿namespace Notepad
+﻿namespace Notepad.SubForm
 {
     partial class ReplaceForm
     {
@@ -61,7 +61,6 @@
             // btn_Search
             // 
             this.btn_Search.Enabled = false;
-            this.btn_Search.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Search.Location = new System.Drawing.Point(403, 19);
             this.btn_Search.Name = "btn_Search";
             this.btn_Search.Size = new System.Drawing.Size(120, 26);
@@ -90,7 +89,6 @@
             // btn_Replace
             // 
             this.btn_Replace.Enabled = false;
-            this.btn_Replace.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Replace.Location = new System.Drawing.Point(403, 62);
             this.btn_Replace.Name = "btn_Replace";
             this.btn_Replace.Size = new System.Drawing.Size(120, 26);
@@ -104,7 +102,6 @@
             // btn_ReplaceAll
             // 
             this.btn_ReplaceAll.Enabled = false;
-            this.btn_ReplaceAll.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_ReplaceAll.Location = new System.Drawing.Point(403, 105);
             this.btn_ReplaceAll.Name = "btn_ReplaceAll";
             this.btn_ReplaceAll.Size = new System.Drawing.Size(120, 26);
@@ -124,6 +121,7 @@
             this.checkBox_MatchCase.TabIndex = 11;
             this.checkBox_MatchCase.Text = "Match case";
             this.checkBox_MatchCase.UseVisualStyleBackColor = true;
+            this.checkBox_MatchCase.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // checkBox_WrapAround
             // 
@@ -134,11 +132,11 @@
             this.checkBox_WrapAround.TabIndex = 10;
             this.checkBox_WrapAround.Text = "Wrap around";
             this.checkBox_WrapAround.UseVisualStyleBackColor = true;
+            this.checkBox_WrapAround.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // btn_Cancel
             // 
             this.btn_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btn_Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Cancel.Location = new System.Drawing.Point(403, 148);
             this.btn_Cancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btn_Cancel.Name = "btn_Cancel";

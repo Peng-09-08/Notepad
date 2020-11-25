@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO;
+using Notepad.SubForm;
+using System.Collections.Generic;
 
 namespace Notepad
 {
@@ -8,12 +10,16 @@ namespace Notepad
     {
         private string _filePath = "";
         private bool _modify = false;
+        private string _copy = "";
+        private Queue _
 
         public MainForm()
         {
             InitializeComponent();
             CommonFunction.RegisterMarkTargetDelegate(MarkTargetLine);
             ReplaceForm.RegisterReplaceTargetDelegate(ReplaceTarget);
+            GoToForm.RegisterGoToLineDelegate(GoToLine);
+            EncryptForm.RegisterEncryptDelegate(EncryptText);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -24,39 +30,17 @@ namespace Notepad
 
         private void MainForm_KeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Modifiers == Keys.Control)
+            if (e.Modifiers == Keys.Alt)
             {
-                switch (e.KeyCode)
-                {
-                    case Keys.F:
-                        CommonFunction.UseEditForm(this, typeof(SearchForm), richTextBox1.SelectionStart);
-                        break;
-                    case Keys.H:
-                        CommonFunction.UseEditForm(this, typeof(ReplaceForm), richTextBox1.SelectionStart);
-                        break;
-                    case Keys.N:
-                        toolStrip_New_Click(null, null);
-                        break;
-                    case Keys.O:
-                        toolStrip_Open_Click(null, null);
-                        break;
-                    case Keys.S:
-                        toolStrip_Save_Click(null, null);
-                        break;
-                }
-            }
-            else if (e.Control && e.Shift && e.KeyCode == Keys.S)
-            {
-                toolStrip_SaveAs_Click(null, null);
-            }
-            else if (e.Modifiers == Keys.Alt)
-            {
-                (CommonFunction._EditForm as ReplaceForm).ReplaceForm_KeyDown(null, e);
+                if (UseEditForm._EditForm != null)
+                    (UseEditForm._EditForm as ReplaceForm).ReplaceForm_KeyDown(null, e);
             }
             else
             {
                 if (e.KeyCode == Keys.F3)
                     CommonFunction.SearchTarget(e.Modifiers == Keys.Shift);
+                else if (e.KeyCode == Keys.Escape)
+                    richTextBox1.DeselectAll();
             }
         }
 
@@ -64,28 +48,35 @@ namespace Notepad
 
         private void richTextBox1_Click(object sender, EventArgs e)
         {
-            CommonFunction._StartIndex = richTextBox1.SelectionStart;
-            ReplaceForm.SetSelectedString = richTextBox1.SelectedText;
-        }
+            //Get Row
+            int selection = richTextBox1.SelectionStart;
+            int row = richTextBox1.GetLineFromCharIndex(selection);
 
-        private void richTextBox1_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            if (e.KeyChar >= 32 && e.KeyChar <= 126)
-            {
-                _modify = true;
-                if (!Text.StartsWith("*"))
-                    Text = Text.Insert(0, "*");
-            }
+            //Get Column
+            int firstChar = richTextBox1.GetFirstCharIndexFromLine(row);
+            int column = selection - firstChar;
+
+            toolStripStatusLabel_Location.Text = string.Format("Row {0}，Col {1}", row + 1, column + 1);
+
+            CommonFunction.StartIndex = selection;
+            ReplaceForm.SetSelectedString = richTextBox1.SelectedText;
         }
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
             CommonFunction.SetContent = richTextBox1.Text;
+            GoToForm.SetLineNumber = richTextBox1.Text.Split('\n').Length;
+
+            _modify = true;
+            if (!Text.StartsWith("*"))
+                Text = Text.Insert(0, "*");
         }
 
         #endregion
 
         #region == ToolStripMenuItem Event ==
+        #region -- File(F) --
+
         private void toolStrip_New_Click(object sender, EventArgs e)
         {
             richTextBox1.Text = _filePath = "";
@@ -151,20 +142,94 @@ namespace Notepad
             }
         }
 
-        private void toolStrip_Close_Click(object sender, EventArgs e)
+        private void toolStrip_Exit_Click(object sender, EventArgs e)
         {
             Close();
         }
 
+        #endregion
+
+        #region -- Edit(E) --
+
+        private void toolStrip_Undo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStrip_Redo_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStrip_Cut_Click(object sender, EventArgs e)
+        {
+            _copy = richTextBox1.SelectedText;
+
+            int start = richTextBox1.SelectionStart;
+            richTextBox1.Text = richTextBox1.Text.Remove(start, _copy.Length);
+            richTextBox1.SelectionStart = start + _copy.Length;
+        }
+
+        private void toolStrip_Copy_Click(object sender, EventArgs e)
+        {
+            _copy = richTextBox1.SelectedText;
+        }
+
+        private void toolStrip_Paste_Click(object sender, EventArgs e)
+        {
+            if (_copy == "")
+                return;
+
+            int start = richTextBox1.SelectionStart;
+            richTextBox1.Text = richTextBox1.Text.Insert(start, _copy);
+            richTextBox1.SelectionStart = start + _copy.Length;
+        }
+
         private void toolStrip_Find_Click(object sender, EventArgs e)
         {
-            CommonFunction.UseEditForm(this, typeof(SearchForm), richTextBox1.SelectionStart);
+            UseEditForm.Edit(this, typeof(SearchForm), richTextBox1.SelectionStart);
         }
 
         private void toolStrip_Replace_Click(object sender, EventArgs e)
         {
-            CommonFunction.UseEditForm(this, typeof(ReplaceForm), richTextBox1.SelectionStart);
+            UseEditForm.Edit(this, typeof(ReplaceForm), richTextBox1.SelectionStart);
         }
+
+        private void toolStrip_Goto_Click(object sender, EventArgs e)
+        {
+            UseEditForm.Edit(this, typeof(GoToForm), richTextBox1.Text.Split('\n').Length);
+        }
+
+        private void toolStrip_SelectAll_Click(object sender, EventArgs e)
+        {
+            richTextBox1.SelectAll();
+        }
+
+        private void toolStrip_Encrypt_Click(object sender, EventArgs e)
+        {
+            UseEditForm.Edit(this, typeof(EncryptForm), richTextBox1.Text);
+        }
+
+        #endregion
+
+        #region -- View(V) --
+
+        private void toolStrip_ZoomIn_Click(object sender, EventArgs e)
+        {
+        }
+
+        private void toolStrip_ZoomOut_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void toolStrip_Status_Click(object sender, EventArgs e)
+        {
+            toolStrip_Status.Checked = !toolStrip_Status.Checked;
+            statusStrip1.Visible = toolStrip_Status.Checked;
+        }
+
+        #endregion
 
         #endregion
 
@@ -185,6 +250,18 @@ namespace Notepad
             _modify = true;
             if (!Text.StartsWith("*"))
                 Text = "*" + Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+        }
+
+        private void GoToLine(int line)
+        {
+            int start = richTextBox1.GetFirstCharIndexFromLine(line);
+            richTextBox1.SelectionStart = start;
+            richTextBox1_Click(null, null);
+        }
+
+        private void EncryptText(string value)
+        {
+            richTextBox1.Text = value;
         }
 
         private DialogResult CheckModify()

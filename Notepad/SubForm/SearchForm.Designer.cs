@@ -1,5 +1,5 @@
 ﻿
-namespace Notepad
+namespace Notepad.SubForm
 {
     partial class SearchForm
     {
@@ -63,7 +63,6 @@ namespace Notepad
             // btn_Search
             // 
             this.btn_Search.Enabled = false;
-            this.btn_Search.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Search.Location = new System.Drawing.Point(430, 19);
             this.btn_Search.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btn_Search.Name = "btn_Search";
@@ -78,7 +77,6 @@ namespace Notepad
             // btn_Cancel
             // 
             this.btn_Cancel.DialogResult = System.Windows.Forms.DialogResult.Cancel;
-            this.btn_Cancel.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btn_Cancel.Location = new System.Drawing.Point(430, 63);
             this.btn_Cancel.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
             this.btn_Cancel.Name = "btn_Cancel";
@@ -101,6 +99,7 @@ namespace Notepad
             this.radioBtn_Next.TabStop = true;
             this.radioBtn_Next.Text = "Next";
             this.radioBtn_Next.UseVisualStyleBackColor = true;
+            this.radioBtn_Next.CheckedChanged += new System.EventHandler(this.radioBtn_Next_CheckedChanged);
             // 
             // checkBox_WrapAround
             // 
@@ -111,6 +110,7 @@ namespace Notepad
             this.checkBox_WrapAround.TabIndex = 7;
             this.checkBox_WrapAround.Text = "Wrap around";
             this.checkBox_WrapAround.UseVisualStyleBackColor = true;
+            this.checkBox_WrapAround.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // checkBox_MatchCase
             // 
@@ -121,6 +121,7 @@ namespace Notepad
             this.checkBox_MatchCase.TabIndex = 8;
             this.checkBox_MatchCase.Text = "Match case";
             this.checkBox_MatchCase.UseVisualStyleBackColor = true;
+            this.checkBox_MatchCase.CheckedChanged += new System.EventHandler(this.checkBox_CheckedChanged);
             // 
             // groupBox1
             // 

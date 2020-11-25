@@ -1,14 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace Notepad
+namespace Notepad.SubForm
 {
     public partial class ReplaceForm : Form
     {
@@ -43,7 +37,7 @@ namespace Notepad
             if (e.Modifiers == Keys.Control)
             {
                 if (e.KeyCode == Keys.F)
-                    CommonFunction.UseEditForm(Owner, typeof(SearchForm), 0);
+                    UseEditForm.Edit(Owner, typeof(SearchForm), 0);
             }
             else if (e.Modifiers == Keys.Alt)
             {
@@ -58,28 +52,28 @@ namespace Notepad
 
         private void btn_Search_Click(object sender, EventArgs e)
         {
-            txt_Target.Focus(); //避免按鈕邊框變厚
+            //txt_Target.Focus(); //避免按鈕邊框變厚
             CommonFunction.SearchTarget(false);
         }
 
         private void btn_Replace_Click(object sender, EventArgs e)
         {
-            txt_Target.Focus(); //避免按鈕邊框變厚
+            //txt_Target.Focus(); //避免按鈕邊框變厚
             if (_SelectedContent == txt_Target.Text)
-                _replaceTargetHandler(CommonFunction._StartIndex, _SelectedContent, txt_Replace.Text);
+                _replaceTargetHandler(CommonFunction.StartIndex, _SelectedContent, txt_Replace.Text);
 
             CommonFunction.SearchTarget(false);
         }
 
         private void btn_ReplaceAll_Click(object sender, EventArgs e)
         {
-            txt_Target.Focus(); //避免按鈕邊框變厚
+            //txt_Target.Focus(); //避免按鈕邊框變厚
             _replaceTargetHandler(-1, txt_Target.Text, txt_Replace.Text);
         }
 
         private void btn_Cancel_Click(object sender, EventArgs e)
         {
-            Close();
+            UseEditForm.CloseForm();
         }
 
         private void button_MouseEnter(object sender, EventArgs e)
@@ -97,7 +91,16 @@ namespace Notepad
         private void txt_Target_TextChanged(object sender, EventArgs e)
         {
             btn_Search.Enabled = btn_Replace.Enabled = btn_ReplaceAll.Enabled = txt_Target.Text != "";
-            CommonFunction.SetTarget = txt_Target.Text;
+            CommonFunction.Target = txt_Target.Text;
+        }
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox.Text.Contains("Match"))
+                CommonFunction.SetMatchCase = checkBox.Checked;
+            else
+                CommonFunction.SetWrapAround = checkBox.Checked;
         }
     }
 }

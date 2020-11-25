@@ -2,7 +2,7 @@
 using System.Drawing;
 using System.Windows.Forms;
 
-namespace Notepad
+namespace Notepad.SubForm
 {
     public partial class SearchForm : Form
     {
@@ -12,21 +12,27 @@ namespace Notepad
         public SearchForm()
         {
             InitializeComponent();
+            AcceptButton = btn_Search;
             CancelButton = btn_Cancel;
         }
 
         private void SearchForm_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Modifiers == Keys.Control && e.KeyCode == Keys.H)
-                CommonFunction.UseEditForm(Owner, typeof(ReplaceForm), 0);
+                UseEditForm.Edit(Owner, typeof(ReplaceForm), 0);
             else if (e.KeyCode == Keys.F3)
                 CommonFunction.SearchTarget(e.Modifiers == Keys.Shift);
         }
 
         private void btn_Search_Click(object sender, EventArgs e)
         {
-            txt_Target.Focus(); //避免按鈕邊框變厚
+            //txt_Target.Focus(); //避免按鈕邊框變厚
             CommonFunction.SearchTarget(radioBtn_Previous.Checked);
+        }
+
+        private void btn_Cancel_Click(object sender, EventArgs e)
+        {
+            UseEditForm.CloseForm();
         }
 
         private void button_MouseEnter(object sender, EventArgs e)
@@ -41,15 +47,25 @@ namespace Notepad
             (sender as Button).FlatAppearance.MouseOverBackColor = SystemColors.Control;
         }
 
-        private void btn_Cancel_Click(object sender, EventArgs e)
-        {
-            Close();
-        }
-
         private void txt_Target_TextChanged(object sender, EventArgs e)
         {
             btn_Search.Enabled = txt_Target.Text != "";
-            CommonFunction.SetTarget = txt_Target.Text;
+            CommonFunction.Target = txt_Target.Text;
+        }
+
+        private void checkBox_CheckedChanged(object sender, EventArgs e)
+        {
+            CheckBox checkBox = sender as CheckBox;
+            if (checkBox.Text.Contains("Match"))
+                CommonFunction.SetMatchCase = checkBox.Checked;
+            else
+                CommonFunction.SetWrapAround = checkBox.Checked;
+        }
+
+        private void radioBtn_Next_CheckedChanged(object sender, EventArgs e)
+        {
+            if (radioBtn_Next.Checked)
+                CommonFunction.StartIndex += CommonFunction.Target.Length;
         }
 
         //private Dictionary<string, Func<int, bool>> _criteriaIndex = new Dictionary<string, Func<int, bool>>();

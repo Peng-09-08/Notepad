@@ -49,7 +49,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CommonFunction.cs" />
+    <Compile Include="SubForm\CommonFunction.cs" />
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,6 +58,18 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SubForm\EncryptForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubForm\EncryptForm.Designer.cs">
+      <DependentUpon>EncryptForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="SubForm\GoToForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="SubForm\GoToForm.Designer.cs">
+      <DependentUpon>GoToForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="SubForm\ReplaceForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -70,6 +82,7 @@
     <Compile Include="SubForm\SearchForm.Designer.cs">
       <DependentUpon>SearchForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="SubForm\UseEditForm.cs" />
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -83,6 +96,12 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="SubForm\EncryptForm.resx">
+      <DependentUpon>EncryptForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="SubForm\GoToForm.resx">
+      <DependentUpon>GoToForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SubForm\ReplaceForm.resx">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -103,6 +122,23 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Icons\Copy.png" />
+    <None Include="Icons\Cut.png" />
+    <None Include="Icons\Replace.png" />
+    <None Include="Icons\Select All.png" />
+    <None Include="Icons\Zoom In.png" />
+    <None Include="Icons\Zoom Out.png" />
+    <None Include="Icons\Undo.png" />
+    <None Include="Icons\Go To.png" />
+    <None Include="Icons\Encrypt.png" />
+    <None Include="Icons\Paste.png" />
+    <None Include="Icons\New.png" />
+    <None Include="Icons\Open.png" />
+    <None Include="Icons\Save.png" />
+    <None Include="Icons\Save As.png" />
+    <None Include="Icons\Find.png" />
+    <None Include="Icons\Zoom.png" />
+    <None Include="Icons\Close.png" />
     <Content Include="Notepad.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -30,14 +30,13 @@ namespace Notepad
         private void InitializeComponent()
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
-            this.richTextBox1 = new System.Windows.Forms.RichTextBox();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.optionToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem4 = new System.Windows.Forms.ToolStripSeparator();
             this.editToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStripMenuItem1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripMenuItem2 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripMenuItem3 = new System.Windows.Forms.ToolStripSeparator();
+            this.toolStrip_Format = new System.Windows.Forms.ToolStripMenuItem();
             this.viewToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Status = new System.Windows.Forms.ToolStripMenuItem();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
@@ -45,6 +44,10 @@ namespace Notepad
             this.toolStripStatusLabel1 = new System.Windows.Forms.ToolStripStatusLabel();
             this.toolStripStatusLabel_Factor = new System.Windows.Forms.ToolStripStatusLabel();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.customRtb = new Notepad.CustomRichTextBox();
+            this.fontDialog1 = new System.Windows.Forms.FontDialog();
+            this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.toolStrip_BackColor = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_New = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Open = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Save = new System.Windows.Forms.ToolStripMenuItem();
@@ -55,11 +58,13 @@ namespace Notepad
             this.toolStrip_Cut = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Copy = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Paste = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip_Find = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip_Replace = new System.Windows.Forms.ToolStripMenuItem();
-            this.toolStrip_Goto = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_SelectAll = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_Search = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_Replace = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_GoTo = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_Encrypt = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_Font = new System.Windows.Forms.ToolStripMenuItem();
+            this.toolStrip_ForeColor = new System.Windows.Forms.ToolStripMenuItem();
             this.zoomToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_ZoomIn = new System.Windows.Forms.ToolStripMenuItem();
             this.toolStrip_ZoomOut = new System.Windows.Forms.ToolStripMenuItem();
@@ -69,18 +74,6 @@ namespace Notepad
             this.tableLayoutPanel1.SuspendLayout();
             this.SuspendLayout();
             // 
-            // richTextBox1
-            // 
-            this.richTextBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.richTextBox1.Location = new System.Drawing.Point(0, 30);
-            this.richTextBox1.Margin = new System.Windows.Forms.Padding(0);
-            this.richTextBox1.Name = "richTextBox1";
-            this.richTextBox1.Size = new System.Drawing.Size(584, 351);
-            this.richTextBox1.TabIndex = 0;
-            this.richTextBox1.Text = "";
-            this.richTextBox1.Click += new System.EventHandler(this.richTextBox1_Click);
-            this.richTextBox1.TextChanged += new System.EventHandler(this.richTextBox1_TextChanged);
-            // 
             // menuStrip1
             // 
             this.menuStrip1.Dock = System.Windows.Forms.DockStyle.Fill;
@@ -89,11 +82,12 @@ namespace Notepad
             this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.optionToolStripMenuItem,
             this.editToolStripMenuItem,
+            this.toolStrip_Format,
             this.viewToolStripMenuItem});
             this.menuStrip1.Location = new System.Drawing.Point(0, 0);
             this.menuStrip1.Name = "menuStrip1";
             this.menuStrip1.Padding = new System.Windows.Forms.Padding(0);
-            this.menuStrip1.Size = new System.Drawing.Size(584, 30);
+            this.menuStrip1.Size = new System.Drawing.Size(664, 30);
             this.menuStrip1.TabIndex = 3;
             this.menuStrip1.Text = "menuStrip1";
             // 
@@ -127,12 +121,11 @@ namespace Notepad
             this.toolStrip_Cut,
             this.toolStrip_Copy,
             this.toolStrip_Paste,
-            this.toolStripMenuItem2,
-            this.toolStrip_Find,
-            this.toolStrip_Replace,
-            this.toolStrip_Goto,
             this.toolStrip_SelectAll,
-            this.toolStripMenuItem3,
+            this.toolStripMenuItem2,
+            this.toolStrip_Search,
+            this.toolStrip_Replace,
+            this.toolStrip_GoTo,
             this.toolStrip_Encrypt});
             this.editToolStripMenuItem.Name = "editToolStripMenuItem";
             this.editToolStripMenuItem.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.E)));
@@ -142,17 +135,24 @@ namespace Notepad
             // toolStripMenuItem1
             // 
             this.toolStripMenuItem1.Name = "toolStripMenuItem1";
-            this.toolStripMenuItem1.Size = new System.Drawing.Size(265, 6);
+            this.toolStripMenuItem1.Size = new System.Drawing.Size(273, 6);
             // 
             // toolStripMenuItem2
             // 
             this.toolStripMenuItem2.Name = "toolStripMenuItem2";
-            this.toolStripMenuItem2.Size = new System.Drawing.Size(265, 6);
+            this.toolStripMenuItem2.Size = new System.Drawing.Size(273, 6);
             // 
-            // toolStripMenuItem3
+            // toolStrip_Format
             // 
-            this.toolStripMenuItem3.Name = "toolStripMenuItem3";
-            this.toolStripMenuItem3.Size = new System.Drawing.Size(265, 6);
+            this.toolStrip_Format.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.toolStrip_Font,
+            this.toolStrip_ForeColor,
+            this.toolStrip_BackColor});
+            this.toolStrip_Format.Name = "toolStrip_Format";
+            this.toolStrip_Format.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.O)));
+            this.toolStrip_Format.ShowShortcutKeys = false;
+            this.toolStrip_Format.Size = new System.Drawing.Size(92, 30);
+            this.toolStrip_Format.Text = "Format(&O)";
             // 
             // viewToolStripMenuItem
             // 
@@ -183,9 +183,9 @@ namespace Notepad
             this.toolStripStatusLabel1,
             this.toolStripStatusLabel_Factor});
             this.statusStrip1.LayoutStyle = System.Windows.Forms.ToolStripLayoutStyle.HorizontalStackWithOverflow;
-            this.statusStrip1.Location = new System.Drawing.Point(0, 381);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 401);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(584, 30);
+            this.statusStrip1.Size = new System.Drawing.Size(664, 30);
             this.statusStrip1.TabIndex = 4;
             this.statusStrip1.Text = "statusStrip1";
             // 
@@ -213,8 +213,8 @@ namespace Notepad
             this.tableLayoutPanel1.ColumnCount = 1;
             this.tableLayoutPanel1.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.Controls.Add(this.menuStrip1, 0, 0);
-            this.tableLayoutPanel1.Controls.Add(this.richTextBox1, 0, 1);
             this.tableLayoutPanel1.Controls.Add(this.statusStrip1, 0, 2);
+            this.tableLayoutPanel1.Controls.Add(this.customRtb, 0, 1);
             this.tableLayoutPanel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel1.Location = new System.Drawing.Point(0, 0);
             this.tableLayoutPanel1.Name = "tableLayoutPanel1";
@@ -222,8 +222,32 @@ namespace Notepad
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 100F));
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 30F));
-            this.tableLayoutPanel1.Size = new System.Drawing.Size(584, 411);
+            this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 20F));
+            this.tableLayoutPanel1.Size = new System.Drawing.Size(664, 431);
             this.tableLayoutPanel1.TabIndex = 5;
+            // 
+            // customRtb
+            // 
+            this.customRtb.Dock = System.Windows.Forms.DockStyle.Fill;
+            this.customRtb.Location = new System.Drawing.Point(3, 33);
+            this.customRtb.Name = "customRtb";
+            this.customRtb.Size = new System.Drawing.Size(658, 365);
+            this.customRtb.TabIndex = 0;
+            this.customRtb.Text = "";
+            this.customRtb.Click += new System.EventHandler(this.customRtb_Click);
+            this.customRtb.TextChanged += new System.EventHandler(this.customRtb_TextChanged);
+            // 
+            // colorDialog1
+            // 
+            this.colorDialog1.FullOpen = true;
+            // 
+            // toolStrip_BackColor
+            // 
+            this.toolStrip_BackColor.Image = global::Notepad.Properties.Resources.Fill;
+            this.toolStrip_BackColor.Name = "toolStrip_BackColor";
+            this.toolStrip_BackColor.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_BackColor.Text = "BackColor";
+            this.toolStrip_BackColor.Click += new System.EventHandler(this.toolStrip_BackColor_Click);
             // 
             // toolStrip_New
             // 
@@ -268,7 +292,7 @@ namespace Notepad
             // 
             // toolStrip_Exit
             // 
-            this.toolStrip_Exit.Image = global::Notepad.Properties.Resources.Close;
+            this.toolStrip_Exit.Image = global::Notepad.Properties.Resources.Exit;
             this.toolStrip_Exit.Name = "toolStrip_Exit";
             this.toolStrip_Exit.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Alt | System.Windows.Forms.Keys.F4)));
             this.toolStrip_Exit.ShowShortcutKeys = false;
@@ -282,8 +306,8 @@ namespace Notepad
             this.toolStrip_Undo.Name = "toolStrip_Undo";
             this.toolStrip_Undo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Z)));
             this.toolStrip_Undo.ShowShortcutKeys = false;
-            this.toolStrip_Undo.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Undo.Text = "Undo             Ctrl + Z";
+            this.toolStrip_Undo.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Undo.Text = "Undo              Ctrl + Z";
             this.toolStrip_Undo.Click += new System.EventHandler(this.toolStrip_Undo_Click);
             // 
             // toolStrip_Redo
@@ -292,8 +316,8 @@ namespace Notepad
             this.toolStrip_Redo.Name = "toolStrip_Redo";
             this.toolStrip_Redo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.Y)));
             this.toolStrip_Redo.ShowShortcutKeys = false;
-            this.toolStrip_Redo.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Redo.Text = "Redo             Ctrl + Y";
+            this.toolStrip_Redo.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Redo.Text = "Redo              Ctrl + Y";
             this.toolStrip_Redo.Click += new System.EventHandler(this.toolStrip_Redo_Click);
             // 
             // toolStrip_Cut
@@ -302,8 +326,8 @@ namespace Notepad
             this.toolStrip_Cut.Name = "toolStrip_Cut";
             this.toolStrip_Cut.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.X)));
             this.toolStrip_Cut.ShowShortcutKeys = false;
-            this.toolStrip_Cut.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Cut.Text = "Cut              Ctrl + X";
+            this.toolStrip_Cut.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Cut.Text = "Cut               Ctrl + X";
             this.toolStrip_Cut.Click += new System.EventHandler(this.toolStrip_Cut_Click);
             // 
             // toolStrip_Copy
@@ -312,8 +336,8 @@ namespace Notepad
             this.toolStrip_Copy.Name = "toolStrip_Copy";
             this.toolStrip_Copy.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.C)));
             this.toolStrip_Copy.ShowShortcutKeys = false;
-            this.toolStrip_Copy.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Copy.Text = "Copy             Ctrl + C";
+            this.toolStrip_Copy.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Copy.Text = "Copy              Ctrl + C";
             this.toolStrip_Copy.Click += new System.EventHandler(this.toolStrip_Copy_Click);
             // 
             // toolStrip_Paste
@@ -322,39 +346,9 @@ namespace Notepad
             this.toolStrip_Paste.Name = "toolStrip_Paste";
             this.toolStrip_Paste.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.V)));
             this.toolStrip_Paste.ShowShortcutKeys = false;
-            this.toolStrip_Paste.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Paste.Text = "Paste            Ctrl + V";
+            this.toolStrip_Paste.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Paste.Text = "Paste             Ctrl + V";
             this.toolStrip_Paste.Click += new System.EventHandler(this.toolStrip_Paste_Click);
-            // 
-            // toolStrip_Find
-            // 
-            this.toolStrip_Find.Image = global::Notepad.Properties.Resources.Find;
-            this.toolStrip_Find.Name = "toolStrip_Find";
-            this.toolStrip_Find.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
-            this.toolStrip_Find.ShowShortcutKeys = false;
-            this.toolStrip_Find.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Find.Text = "Find             Ctrl + F";
-            this.toolStrip_Find.Click += new System.EventHandler(this.toolStrip_Find_Click);
-            // 
-            // toolStrip_Replace
-            // 
-            this.toolStrip_Replace.Image = global::Notepad.Properties.Resources.Replace;
-            this.toolStrip_Replace.Name = "toolStrip_Replace";
-            this.toolStrip_Replace.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
-            this.toolStrip_Replace.ShowShortcutKeys = false;
-            this.toolStrip_Replace.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Replace.Text = "Replace          Ctrl + H";
-            this.toolStrip_Replace.Click += new System.EventHandler(this.toolStrip_Replace_Click);
-            // 
-            // toolStrip_Goto
-            // 
-            this.toolStrip_Goto.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_Goto.Image")));
-            this.toolStrip_Goto.Name = "toolStrip_Goto";
-            this.toolStrip_Goto.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
-            this.toolStrip_Goto.ShowShortcutKeys = false;
-            this.toolStrip_Goto.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Goto.Text = "Go To            Ctrl + G";
-            this.toolStrip_Goto.Click += new System.EventHandler(this.toolStrip_Goto_Click);
             // 
             // toolStrip_SelectAll
             // 
@@ -362,9 +356,39 @@ namespace Notepad
             this.toolStrip_SelectAll.Name = "toolStrip_SelectAll";
             this.toolStrip_SelectAll.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.A)));
             this.toolStrip_SelectAll.ShowShortcutKeys = false;
-            this.toolStrip_SelectAll.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_SelectAll.Text = "Select All       Ctrl + A";
+            this.toolStrip_SelectAll.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_SelectAll.Text = "Select All        Ctrl + A";
             this.toolStrip_SelectAll.Click += new System.EventHandler(this.toolStrip_SelectAll_Click);
+            // 
+            // toolStrip_Search
+            // 
+            this.toolStrip_Search.Image = global::Notepad.Properties.Resources.Search;
+            this.toolStrip_Search.Name = "toolStrip_Search";
+            this.toolStrip_Search.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.F)));
+            this.toolStrip_Search.ShowShortcutKeys = false;
+            this.toolStrip_Search.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Search.Text = "Search            Ctrl + F";
+            this.toolStrip_Search.Click += new System.EventHandler(this.toolStrip_Form_Click);
+            // 
+            // toolStrip_Replace
+            // 
+            this.toolStrip_Replace.Image = global::Notepad.Properties.Resources.Replace;
+            this.toolStrip_Replace.Name = "toolStrip_Replace";
+            this.toolStrip_Replace.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.H)));
+            this.toolStrip_Replace.ShowShortcutKeys = false;
+            this.toolStrip_Replace.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Replace.Text = "Replace           Ctrl + H";
+            this.toolStrip_Replace.Click += new System.EventHandler(this.toolStrip_Form_Click);
+            // 
+            // toolStrip_GoTo
+            // 
+            this.toolStrip_GoTo.Image = ((System.Drawing.Image)(resources.GetObject("toolStrip_GoTo.Image")));
+            this.toolStrip_GoTo.Name = "toolStrip_GoTo";
+            this.toolStrip_GoTo.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.G)));
+            this.toolStrip_GoTo.ShowShortcutKeys = false;
+            this.toolStrip_GoTo.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_GoTo.Text = "Go To             Ctrl + G";
+            this.toolStrip_GoTo.Click += new System.EventHandler(this.toolStrip_Form_Click);
             // 
             // toolStrip_Encrypt
             // 
@@ -372,9 +396,26 @@ namespace Notepad
             this.toolStrip_Encrypt.Name = "toolStrip_Encrypt";
             this.toolStrip_Encrypt.ShortcutKeys = ((System.Windows.Forms.Keys)((System.Windows.Forms.Keys.Control | System.Windows.Forms.Keys.P)));
             this.toolStrip_Encrypt.ShowShortcutKeys = false;
-            this.toolStrip_Encrypt.Size = new System.Drawing.Size(268, 22);
-            this.toolStrip_Encrypt.Text = "Encrypt/Decrypt";
-            this.toolStrip_Encrypt.Click += new System.EventHandler(this.toolStrip_Encrypt_Click);
+            this.toolStrip_Encrypt.Size = new System.Drawing.Size(276, 22);
+            this.toolStrip_Encrypt.Text = "Encrypt/Decrypt   Ctrl + P";
+            this.toolStrip_Encrypt.Click += new System.EventHandler(this.toolStrip_Form_Click);
+            // 
+            // toolStrip_Font
+            // 
+            this.toolStrip_Font.Image = global::Notepad.Properties.Resources.Font;
+            this.toolStrip_Font.Name = "toolStrip_Font";
+            this.toolStrip_Font.ShowShortcutKeys = false;
+            this.toolStrip_Font.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_Font.Text = "Font";
+            this.toolStrip_Font.Click += new System.EventHandler(this.toolStrip_Font_Click);
+            // 
+            // toolStrip_ForeColor
+            // 
+            this.toolStrip_ForeColor.Image = global::Notepad.Properties.Resources.Color;
+            this.toolStrip_ForeColor.Name = "toolStrip_ForeColor";
+            this.toolStrip_ForeColor.Size = new System.Drawing.Size(180, 22);
+            this.toolStrip_ForeColor.Text = "ForeColor";
+            this.toolStrip_ForeColor.Click += new System.EventHandler(this.toolStrip_ForeColor_Click);
             // 
             // zoomToolStripMenuItem
             // 
@@ -396,7 +437,7 @@ namespace Notepad
             this.toolStrip_ZoomIn.ShowShortcutKeys = false;
             this.toolStrip_ZoomIn.Size = new System.Drawing.Size(356, 22);
             this.toolStrip_ZoomIn.Text = "Zoom In                 Ctrl + Plus";
-            this.toolStrip_ZoomIn.Click += new System.EventHandler(this.toolStrip_ZoomIn_Click);
+            this.toolStrip_ZoomIn.Click += new System.EventHandler(this.toolStrip_Zoom_Click);
             // 
             // toolStrip_ZoomOut
             // 
@@ -406,7 +447,7 @@ namespace Notepad
             this.toolStrip_ZoomOut.ShowShortcutKeys = false;
             this.toolStrip_ZoomOut.Size = new System.Drawing.Size(356, 22);
             this.toolStrip_ZoomOut.Text = "Zoom Out                Ctrl + Minus";
-            this.toolStrip_ZoomOut.Click += new System.EventHandler(this.toolStrip_ZoomOut_Click);
+            this.toolStrip_ZoomOut.Click += new System.EventHandler(this.toolStrip_Zoom_Click);
             // 
             // toolStrip_DefaultZoom
             // 
@@ -415,15 +456,17 @@ namespace Notepad
             this.toolStrip_DefaultZoom.ShowShortcutKeys = false;
             this.toolStrip_DefaultZoom.Size = new System.Drawing.Size(356, 22);
             this.toolStrip_DefaultZoom.Text = "Restore Default Zoom    Ctrl + 0";
+            this.toolStrip_DefaultZoom.Click += new System.EventHandler(this.toolStrip_Zoom_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 19F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(584, 411);
+            this.ClientSize = new System.Drawing.Size(664, 431);
             this.Controls.Add(this.tableLayoutPanel1);
             this.Font = new System.Drawing.Font("Consolas", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.ImeMode = System.Windows.Forms.ImeMode.Off;
             this.KeyPreview = true;
             this.MainMenuStrip = this.menuStrip1;
             this.Margin = new System.Windows.Forms.Padding(4, 5, 4, 5);
@@ -443,8 +486,6 @@ namespace Notepad
         }
 
         #endregion
-
-        private System.Windows.Forms.RichTextBox richTextBox1;
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem optionToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_New;
@@ -453,9 +494,9 @@ namespace Notepad
         private System.Windows.Forms.ToolStripMenuItem toolStrip_SaveAs;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Exit;
         private System.Windows.Forms.ToolStripMenuItem editToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem toolStrip_Find;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_Search;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Replace;
-        private System.Windows.Forms.ToolStripMenuItem toolStrip_Goto;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_GoTo;
         private System.Windows.Forms.StatusStrip statusStrip1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_Location;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel_Factor;
@@ -474,10 +515,16 @@ namespace Notepad
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem4;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem1;
         private System.Windows.Forms.ToolStripSeparator toolStripMenuItem2;
-        private System.Windows.Forms.ToolStripSeparator toolStripMenuItem3;
         private System.Windows.Forms.TableLayoutPanel tableLayoutPanel1;
         private System.Windows.Forms.ToolStripStatusLabel toolStripStatusLabel1;
         private System.Windows.Forms.ToolStripMenuItem toolStrip_Redo;
+        private CustomRichTextBox customRtb;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_Format;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_Font;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_ForeColor;
+        private System.Windows.Forms.FontDialog fontDialog1;
+        private System.Windows.Forms.ColorDialog colorDialog1;
+        private System.Windows.Forms.ToolStripMenuItem toolStrip_BackColor;
     }
 }
 

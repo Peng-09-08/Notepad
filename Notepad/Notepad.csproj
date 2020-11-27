@@ -36,6 +36,7 @@
     <ApplicationIcon>Notepad.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="PresentationCore" />
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -49,7 +50,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="SubForm\CommonFunction.cs" />
+    <Compile Include="CustomRichTextBox.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="Edit\CommonFunction.cs" />
+    <Compile Include="Format\ColorForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Format\ColorForm.Designer.cs">
+      <DependentUpon>ColorForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="MainForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -58,31 +68,40 @@
     </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SubForm\EncryptForm.cs">
+    <Compile Include="Edit\EncryptForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubForm\EncryptForm.Designer.cs">
+    <Compile Include="Edit\EncryptForm.Designer.cs">
       <DependentUpon>EncryptForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SubForm\GoToForm.cs">
+    <Compile Include="Format\FontForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubForm\GoToForm.Designer.cs">
+    <Compile Include="Format\FontForm.Designer.cs">
+      <DependentUpon>FontForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Edit\GoToForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Edit\GoToForm.Designer.cs">
       <DependentUpon>GoToForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SubForm\ReplaceForm.cs">
+    <Compile Include="Edit\ReplaceForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubForm\ReplaceForm.Designer.cs">
+    <Compile Include="Edit\ReplaceForm.Designer.cs">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SubForm\SearchForm.cs">
+    <Compile Include="Edit\SearchForm.cs">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="SubForm\SearchForm.Designer.cs">
+    <Compile Include="Edit\SearchForm.Designer.cs">
       <DependentUpon>SearchForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="SubForm\UseEditForm.cs" />
+    <Compile Include="Edit\UseEditForm.cs" />
+    <EmbeddedResource Include="Format\ColorForm.resx">
+      <DependentUpon>ColorForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="MainForm.resx">
       <DependentUpon>MainForm.cs</DependentUpon>
     </EmbeddedResource>
@@ -96,16 +115,19 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
-    <EmbeddedResource Include="SubForm\EncryptForm.resx">
+    <EmbeddedResource Include="Edit\EncryptForm.resx">
       <DependentUpon>EncryptForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SubForm\GoToForm.resx">
+    <EmbeddedResource Include="Format\FontForm.resx">
+      <DependentUpon>FontForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Edit\GoToForm.resx">
       <DependentUpon>GoToForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SubForm\ReplaceForm.resx">
+    <EmbeddedResource Include="Edit\ReplaceForm.resx">
       <DependentUpon>ReplaceForm.cs</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="SubForm\SearchForm.resx">
+    <EmbeddedResource Include="Edit\SearchForm.resx">
       <DependentUpon>SearchForm.cs</DependentUpon>
     </EmbeddedResource>
     <None Include="Properties\Settings.settings">
@@ -136,9 +158,15 @@
     <None Include="Icons\Open.png" />
     <None Include="Icons\Save.png" />
     <None Include="Icons\Save As.png" />
-    <None Include="Icons\Find.png" />
     <None Include="Icons\Zoom.png" />
-    <None Include="Icons\Close.png" />
+    <None Include="Icons\Redo.png" />
+    <None Include="Icons\Font.png" />
+    <None Include="Icons\Exit.png" />
+    <None Include="Icons\Search.png" />
+    <None Include="Icons\Color.png" />
+    <None Include="Icons\Triangle.png" />
+    <None Include="Icons\Fill2.png" />
+    <None Include="Icons\Fill.png" />
     <Content Include="Notepad.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

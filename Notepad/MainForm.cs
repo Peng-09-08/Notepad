@@ -1,17 +1,22 @@
 ﻿using System;
 using System.Windows.Forms;
 using System.IO;
-using Notepad.SubForm;
+using Notepad.Edit;
+using Notepad.Format;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Notepad
 {
     public partial class MainForm : Form
     {
-        private string _filePath = "";
+        private string _filePath = "Untitled";
         private bool _modify = false;
         private string _copy = "";
-        private Queue _
+
+        private bool _push = true;
+        private Stack<KeyValuePair<int, string>> _redo = new Stack<KeyValuePair<int, string>>();
+        private Stack<KeyValuePair<int, string>> _undo = new Stack<KeyValuePair<int, string>>();
 
         public MainForm()
         {
@@ -20,6 +25,8 @@ namespace Notepad
             ReplaceForm.RegisterReplaceTargetDelegate(ReplaceTarget);
             GoToForm.RegisterGoToLineDelegate(GoToLine);
             EncryptForm.RegisterEncryptDelegate(EncryptText);
+            FontForm.RegisterFontDelegate(ChangeFont);
+            ColorForm.RegisterColorDelegate(ChangeColor);
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -32,40 +39,60 @@ namespace Notepad
         {
             if (e.Modifiers == Keys.Alt)
             {
-                if (UseEditForm._EditForm != null)
-                    (UseEditForm._EditForm as ReplaceForm).ReplaceForm_KeyDown(null, e);
+                if (UseEditForm._EditForm is ReplaceForm)
+                {
+                    if (e.KeyCode == Keys.R)
+                        (UseEditForm._EditForm as ReplaceForm).btn_Replace_Click(null, null);
+                    else if (e.KeyCode == Keys.A)
+                        (UseEditForm._EditForm as ReplaceForm).btn_ReplaceAll_Click(null, null);
+                }
+                else if (e.KeyCode == Keys.B)
+                {
+
+                }
+                else if (e.KeyCode == Keys.I)
+                {
+
+                }
+                else if (e.KeyCode == Keys.U)
+                {
+
+                }
             }
             else
             {
                 if (e.KeyCode == Keys.F3)
                     CommonFunction.SearchTarget(e.Modifiers == Keys.Shift);
                 else if (e.KeyCode == Keys.Escape)
-                    richTextBox1.DeselectAll();
+                    customRtb.DeselectAll();
             }
         }
 
-        #region == RichTextBox Event ==
+        #region == CustomRichTextBox Event ==
 
-        private void richTextBox1_Click(object sender, EventArgs e)
+        private void customRtb_Click(object sender, EventArgs e)
         {
             //Get Row
-            int selection = richTextBox1.SelectionStart;
-            int row = richTextBox1.GetLineFromCharIndex(selection);
+            int selection = customRtb.SelectionStart;
+            int row = customRtb.GetLineFromCharIndex(selection);
 
             //Get Column
-            int firstChar = richTextBox1.GetFirstCharIndexFromLine(row);
+            int firstChar = customRtb.GetFirstCharIndexFromLine(row);
             int column = selection - firstChar;
 
             toolStripStatusLabel_Location.Text = string.Format("Row {0}，Col {1}", row + 1, column + 1);
 
-            CommonFunction.StartIndex = selection;
-            ReplaceForm.SetSelectedString = richTextBox1.SelectedText;
+            CommonFunction._StartIndex = selection;
+            ReplaceForm.SetSelectedString = customRtb.SelectedText;
         }
 
-        private void richTextBox1_TextChanged(object sender, EventArgs e)
+        private void customRtb_TextChanged(object sender, EventArgs e)
         {
-            CommonFunction.SetContent = richTextBox1.Text;
-            GoToForm.SetLineNumber = richTextBox1.Text.Split('\n').Length;
+            if (_push)
+                _undo.Push(new KeyValuePair<int, string>(customRtb.SelectionStart, customRtb.PreviousText));
+
+            CommonFunction._Content = customRtb.Text;
+            GoToForm.SetLineNumber = customRtb.Text.Split('\n').Length;
 
             _modify = true;
             if (!Text.StartsWith("*"))
@@ -79,8 +106,12 @@ namespace Notepad
 
         private void toolStrip_New_Click(object sender, EventArgs e)
         {
-            richTextBox1.Text = _filePath = "";
+            customRtb.Text = _filePath = "";
+
             _modify = false;
+            _redo.Clear();
+            _undo.Clear();
+
             Text = "Untitled - Notepad";
         }
 
@@ -98,13 +129,17 @@ namespace Notepad
                     return;
 
                 _filePath = ofd.FileName;
-                richTextBox1.Text = "";
+                customRtb.SelectionStart = 0;
+                customRtb.Text = "";
 
                 using (StreamReader reader = new StreamReader(ofd.FileName))
-                    richTextBox1.Text = reader.ReadToEnd();
+                    customRtb.Text = reader.ReadToEnd();
 
                 _modify = false;
-                Text = Path.GetFileNameWithoutExtension(ofd.FileName) + " - Notepad";
+                _redo.Clear();
+                _undo.Clear();
+
+                Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
             }
         }
 
@@ -114,7 +149,7 @@ namespace Notepad
                 return;
 
             using (StreamWriter writer = new StreamWriter(_filePath, false))
-                writer.Write(richTextBox1.Text);
+                writer.Write(customRtb.Text);
 
             _modify = false;
             Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
@@ -122,7 +157,7 @@ namespace Notepad
 
         private void toolStrip_SaveAs_Click(object sender, EventArgs e)
         {
-            if (richTextBox1.Text == "")
+            if (customRtb.Text == "")
                 return;
 
             using (SaveFileDialog sfd = new SaveFileDialog())
@@ -135,10 +170,10 @@ namespace Notepad
 
                 _filePath = sfd.FileName;
                 using (StreamWriter writer = new StreamWriter(sfd.FileName, false))
-                    writer.Write(richTextBox1.Text);
+                    writer.Write(customRtb.Text);
 
                 _modify = false;
-                Text = Path.GetFileNameWithoutExtension(sfd.FileName) + " - Notepad";
+                Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
             }
         }
 
@@ -151,28 +186,54 @@ namespace Notepad
 
         #region -- Edit(E) --
 
-        private void toolStrip_Undo_Click(object sender, EventArgs e)
+        private void toolStrip_Undo_Click(object sender, EventArgs e) //Ctrl + Z
         {
+            if (_undo.Count == 0)
+                return;
 
+            KeyValuePair<int, string> temp = _undo.Pop();
+            _redo.Push(temp);
+
+            _push = false;
+            customRtb.Text = temp.Value;
+            customRtb.SelectionStart = temp.Key;
+
+            if (_undo.Count == 0)
+            {
+                _modify = false;
+                Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+            }
+
+            //customRtb.Undo();
         }
 
-        private void toolStrip_Redo_Click(object sender, EventArgs e)
+        private void toolStrip_Redo_Click(object sender, EventArgs e) //Ctrl + Y
         {
+            //if (_redo.Count == 0)
+            //    return;
 
+            //KeyValuePair<int, string> temp = _redo.Pop();
+            //_undo.Push(temp);
+
+            //_push = false;
+            //customRtb.Text = temp.Value;
+            //customRtb.SelectionStart = temp.Key;
+
+            //customRtb.Redo();
         }
 
         private void toolStrip_Cut_Click(object sender, EventArgs e)
         {
-            _copy = richTextBox1.SelectedText;
-
-            int start = richTextBox1.SelectionStart;
-            richTextBox1.Text = richTextBox1.Text.Remove(start, _copy.Length);
-            richTextBox1.SelectionStart = start + _copy.Length;
+            _copy = customRtb.SelectedText;
+            _push = true;
+            int start = customRtb.SelectionStart;
+            customRtb.Text = customRtb.Text.Remove(customRtb.SelectionStart, _copy.Length);
+            customRtb.SelectionStart = start + _copy.Length;
         }
 
         private void toolStrip_Copy_Click(object sender, EventArgs e)
         {
-            _copy = richTextBox1.SelectedText;
+            _copy = customRtb.SelectedText;
         }
 
         private void toolStrip_Paste_Click(object sender, EventArgs e)
@@ -180,47 +241,135 @@ namespace Notepad
             if (_copy == "")
                 return;
 
-            int start = richTextBox1.SelectionStart;
-            richTextBox1.Text = richTextBox1.Text.Insert(start, _copy);
-            richTextBox1.SelectionStart = start + _copy.Length;
-        }
-
-        private void toolStrip_Find_Click(object sender, EventArgs e)
-        {
-            UseEditForm.Edit(this, typeof(SearchForm), richTextBox1.SelectionStart);
-        }
-
-        private void toolStrip_Replace_Click(object sender, EventArgs e)
-        {
-            UseEditForm.Edit(this, typeof(ReplaceForm), richTextBox1.SelectionStart);
-        }
-
-        private void toolStrip_Goto_Click(object sender, EventArgs e)
-        {
-            UseEditForm.Edit(this, typeof(GoToForm), richTextBox1.Text.Split('\n').Length);
+            _push = true;
+            int start = customRtb.SelectionStart;
+            customRtb.Text = customRtb.Text.Insert(customRtb.SelectionStart, _copy);
+            customRtb.SelectionStart = start + _copy.Length;
         }
 
         private void toolStrip_SelectAll_Click(object sender, EventArgs e)
         {
-            richTextBox1.SelectAll();
+            customRtb.SelectAll();
         }
 
-        private void toolStrip_Encrypt_Click(object sender, EventArgs e)
+        private void toolStrip_Form_Click(object sender, EventArgs e)
         {
-            UseEditForm.Edit(this, typeof(EncryptForm), richTextBox1.Text);
+            string name = (sender as ToolStripMenuItem).Name.Split('_')[1];
+            object obj = "";
+            if (name == "Search" || name == "Replace")
+                obj = customRtb.SelectionStart;
+            else if (name == "GoTo")
+                obj = customRtb.Text.Split('\n').Length;
+            else if (name == "Encrypt")
+                obj = customRtb.Text;
+
+            Type type = Type.GetType("Notepad.SubForm." + name + "Form");
+            if (type != null)
+                UseEditForm.Edit(this, type, obj);
+        }
+
+        #endregion
+
+        #region -- Format --
+
+        private void toolStrip_Font_Click(object sender, EventArgs e)
+        {
+            customRtb.TextChanged -= new EventHandler(customRtb_TextChanged);
+
+            //-----FontForm-----//
+            FontForm fontForm = new FontForm(customRtb.Font.FontFamily, customRtb.Font.Size, customRtb.Font.Style)
+            {
+                Owner = this,
+                Location = new Point(Location.X + 250, Location.Y + 50),
+            };
+
+            fontForm.ShowDialog();
+            //-----//
+
+            //-----FontDialog-----//
+            //bool nonSelection = customRtb.SelectedText == "";
+            //fontDialog1.Font = nonSelection ? customRtb.Font : customRtb.SelectionFont;
+
+            //if (fontDialog1.ShowDialog() == DialogResult.Cancel)
+            //    return;
+
+            //if (nonSelection)
+            //    customRtb.Font = new Font(fontDialog1.Font.FontFamily, fontDialog1.Font.Size, fontDialog1.Font.Style);
+            //else
+            //    customRtb.SelectionFont = new Font(fontDialog1.Font.FontFamily, fontDialog1.Font.Size, fontDialog1.Font.Style);
+            //-----//
+
+            customRtb.TextChanged += new EventHandler(customRtb_TextChanged);
+        }
+
+        private void toolStrip_ForeColor_Click(object sender, EventArgs e)
+        {
+            customRtb.TextChanged -= new EventHandler(customRtb_TextChanged);
+
+            bool nonSelection = customRtb.SelectedText == "";
+            Color fore = nonSelection ? customRtb.ForeColor : customRtb.SelectionColor;
+
+            //-----ColorForm-----// //ForeColor + BackColor
+            //Color back = nonSelection ? customRtb.BackColor : customRtb.SelectionBackColor;
+            //ColorForm colorForm = new ColorForm(fore, back)
+            //{
+            //    Owner = this,
+            //    Location = new Point(Location.X + 250, Location.Y + 50),
+            //};
+
+            //colorForm.ShowDialog();
+            //-----//
+
+            //-----ColorDialog-----//
+            colorDialog1.Color = fore;
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+
+            if (nonSelection)
+                customRtb.ForeColor = colorDialog1.Color;
+            else
+                customRtb.SelectionColor = colorDialog1.Color;
+            //-----//
+
+            customRtb.TextChanged += new EventHandler(customRtb_TextChanged);
+        }
+
+        private void toolStrip_BackColor_Click(object sender, EventArgs e)
+        {
+            customRtb.TextChanged -= new EventHandler(customRtb_TextChanged);
+
+            bool nonSelection = customRtb.SelectedText == "";
+            Color back = nonSelection ? customRtb.BackColor : customRtb.SelectionBackColor;
+            colorDialog1.Color = back;
+            if (colorDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+
+            if (nonSelection)
+                customRtb.BackColor = colorDialog1.Color;
+            else
+                customRtb.SelectionBackColor = colorDialog1.Color;
+
+            customRtb.TextChanged += new EventHandler(customRtb_TextChanged);
         }
 
         #endregion
 
         #region -- View(V) --
 
-        private void toolStrip_ZoomIn_Click(object sender, EventArgs e)
+        private void toolStrip_Zoom_Click(object sender, EventArgs e)
         {
-        }
+            if (customRtb.ZoomFactor > 0.01f && customRtb.ZoomFactor < 5.0f)
+            {
+                string name = (sender as ToolStripMenuItem).Name;
+                if (name.Contains("In"))
+                    customRtb.ZoomFactor += 0.1f;
+                else if (name.Contains("Out"))
+                    customRtb.ZoomFactor -= 0.1f;
+                else
+                    customRtb.ZoomFactor = 1.0f;
 
-        private void toolStrip_ZoomOut_Click(object sender, EventArgs e)
-        {
-
+                toolStripStatusLabel_Factor.Text = string.Format("{0}%", customRtb.ZoomFactor * 100);
+            }
         }
 
         private void toolStrip_Status_Click(object sender, EventArgs e)
@@ -233,36 +382,66 @@ namespace Notepad
 
         #endregion
 
+        #region == Callback Function ==
+
         private void MarkTargetLine(int index, int length)
         {
-            richTextBox1.Select(index, length);
-            richTextBox1.HideSelection = false;
-            ReplaceForm.SetSelectedString = richTextBox1.SelectedText;
+            customRtb.Select(index, length);
+            customRtb.HideSelection = false;
+            ReplaceForm.SetSelectedString = customRtb.SelectedText;
         }
 
         private void ReplaceTarget(int startIndex, string oldValue, string newValue)
         {
+            _push = true;
             if (startIndex == -1)
-                richTextBox1.Text = richTextBox1.Text.Replace(oldValue, newValue);
+                customRtb.Text = customRtb.Text.Replace(oldValue, newValue);
             else
-                richTextBox1.Text = ReplaceAt(richTextBox1.Text, startIndex - 1, oldValue.Length, newValue);
+                customRtb.Text = ReplaceAt(customRtb.Text, startIndex - 1, oldValue.Length, newValue);
+        }
 
-            _modify = true;
-            if (!Text.StartsWith("*"))
-                Text = "*" + Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+        private string ReplaceAt(string str, int index, int length, string replace)
+        {
+            //return str.Remove(index, Math.Min(length, str.Length - index)).Insert(index, replace);
+            return str.Remove(index, length).Insert(index, replace);
         }
 
         private void GoToLine(int line)
         {
-            int start = richTextBox1.GetFirstCharIndexFromLine(line);
-            richTextBox1.SelectionStart = start;
-            richTextBox1_Click(null, null);
+            int start = customRtb.GetFirstCharIndexFromLine(line);
+            customRtb.SelectionStart = start;
+            customRtb_Click(null, null);
         }
 
         private void EncryptText(string value)
         {
-            richTextBox1.Text = value;
+            _push = true;
+            customRtb.Text = value;
         }
+
+        private void ChangeFont(FontFamily family, float size, FontStyle style)
+        {
+            if (customRtb.SelectedText == "")
+                customRtb.Font = new Font(family, size, style);
+            else
+                customRtb.SelectionFont = new Font(family, size, style);
+        }
+
+        private void ChangeColor(Color foreColor, Color backColor)
+        {
+            if (customRtb.SelectedText == "")
+            {
+                customRtb.ForeColor = foreColor;
+                customRtb.BackColor = backColor;
+            }
+            else
+            {
+                customRtb.SelectionColor = foreColor;
+                customRtb.SelectionBackColor = backColor;
+            }
+        }
+
+        #endregion
 
         private DialogResult CheckModify()
         {
@@ -276,11 +455,6 @@ namespace Notepad
                 toolStrip_Save_Click(null, null);
 
             return result;
-        }
-
-        private string ReplaceAt(string str, int index, int length, string replace)
-        {
-            return str.Remove(index, Math.Min(length, str.Length - index)).Insert(index, replace);
         }
     }
 }

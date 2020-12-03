@@ -16,7 +16,11 @@ namespace Notepad
         protected override void OnKeyDown(KeyEventArgs e)
         {
             _previousText = Text;
-            base.OnKeyDown(e);
+
+            if (e.Control && e.KeyCode == Keys.I)
+                e.SuppressKeyPress = true;
+            else
+                base.OnKeyDown(e);
         }
     }
 }

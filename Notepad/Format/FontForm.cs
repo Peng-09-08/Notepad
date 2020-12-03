@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Drawing;
 using System.Windows.Forms;
-using System.Windows;
-using FontStyle = System.Drawing.FontStyle;
+//using System.Windows;
+//using FontStyle = System.Drawing.FontStyle;
 
 namespace Notepad.Format
 {
@@ -36,8 +36,6 @@ namespace Notepad.Format
             listBox_Font.SelectedItem = family.Name;
             listBox_Style.SelectedItem = style.ToString();
             listBox_Size.SelectedItem = size.ToString();
-
-            TextDecoration myUnderline = new TextDecoration();
         }
 
         private void btn_OK_Click(object sender, EventArgs e)

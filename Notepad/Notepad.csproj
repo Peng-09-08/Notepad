@@ -165,7 +165,6 @@
     <None Include="Icons\Search.png" />
     <None Include="Icons\Color.png" />
     <None Include="Icons\Triangle.png" />
-    <None Include="Icons\Fill2.png" />
     <None Include="Icons\Fill.png" />
     <Content Include="Notepad.ico" />
   </ItemGroup>

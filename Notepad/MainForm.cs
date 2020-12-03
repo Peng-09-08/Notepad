@@ -5,6 +5,7 @@ using Notepad.Edit;
 using Notepad.Format;
 using System.Collections.Generic;
 using System.Drawing;
+using System.ComponentModel;
 
 namespace Notepad
 {
@@ -12,7 +13,6 @@ namespace Notepad
     {
         private string _filePath = "Untitled";
         private bool _modify = false;
-        private string _copy = "";
 
         private bool _push = true;
         private Stack<KeyValuePair<int, string>> _redo = new Stack<KeyValuePair<int, string>>();
@@ -27,6 +27,40 @@ namespace Notepad
             EncryptForm.RegisterEncryptDelegate(EncryptText);
             FontForm.RegisterFontDelegate(ChangeFont);
             ColorForm.RegisterColorDelegate(ChangeColor);
+
+            ContextMenuStrip cms = new ContextMenuStrip();
+
+            ToolStripMenuItem undo = new ToolStripMenuItem("Undo");
+            undo.Name = undo.Text;
+            undo.Click += new EventHandler(toolStrip_Undo_Click);
+            cms.Items.Add(undo);
+            ToolStripMenuItem redo = new ToolStripMenuItem("Redo");
+            redo.Name = redo.Text;
+            redo.Click += new EventHandler(toolStrip_Redo_Click);
+            cms.Items.Add(redo);
+            cms.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem cut = new ToolStripMenuItem("Cut");
+            cut.Name = cut.Text;
+            cut.Click += new EventHandler(toolStrip_Cut_Click);
+            cms.Items.Add(cut);
+            ToolStripMenuItem copy = new ToolStripMenuItem("Copy");
+            copy.Name = copy.Text;
+            copy.Click += new EventHandler(toolStrip_Copy_Click);
+            cms.Items.Add(copy);
+            ToolStripMenuItem paste = new ToolStripMenuItem("Paste");
+            paste.Name = paste.Text;
+            paste.Click += new EventHandler(toolStrip_Paste_Click);
+            cms.Items.Add(paste);
+            cms.Items.Add(new ToolStripSeparator());
+
+            ToolStripMenuItem selectAll = new ToolStripMenuItem("Select All");
+            selectAll.Name = selectAll.Text;
+            selectAll.Click += new EventHandler(toolStrip_SelectAll_Click);
+            cms.Items.Add(selectAll);
+
+            cms.Opening += new CancelEventHandler(ContextMenuStrip_Opening);
+            customRtb.ContextMenuStrip = cms;
         }
 
         private void MainForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -46,17 +80,24 @@ namespace Notepad
                     else if (e.KeyCode == Keys.A)
                         (UseEditForm._EditForm as ReplaceForm).btn_ReplaceAll_Click(null, null);
                 }
-                else if (e.KeyCode == Keys.B)
+            }
+            else if (e.Modifiers == Keys.Control)
+            {
+                bool nonSelection = customRtb.SelectedText == "";
+                if (e.KeyCode == Keys.B)
                 {
-
+                    bool enable = nonSelection ? customRtb.Font.Bold : customRtb.SelectionFont.Bold;
+                    MakeStyle(nonSelection, FontStyle.Bold, enable);
                 }
                 else if (e.KeyCode == Keys.I)
                 {
-
+                    bool enable = nonSelection ? customRtb.Font.Italic : customRtb.SelectionFont.Italic;
+                    MakeStyle(nonSelection, FontStyle.Italic, enable);
                 }
                 else if (e.KeyCode == Keys.U)
                 {
-
+                    bool enable = nonSelection ? customRtb.Font.Underline : customRtb.SelectionFont.Underline;
+                    MakeStyle(nonSelection, FontStyle.Underline, enable);
                 }
             }
             else
@@ -86,6 +127,16 @@ namespace Notepad
             ReplaceForm.SetSelectedString = customRtb.SelectedText;
         }
 
+        private void ContextMenuStrip_Opening(object sender, CancelEventArgs e)
+        {
+            ContextMenuStrip cms = sender as ContextMenuStrip;
+            cms.Items["Undo"].Enabled = customRtb.CanUndo;
+            cms.Items["Redo"].Enabled = customRtb.CanRedo;
+            cms.Items["Cut"].Enabled = cms.Items["Copy"].Enabled = customRtb.SelectionLength > 0;
+            cms.Items["Paste"].Enabled = Clipboard.ContainsText();
+            cms.Items["Select All"].Enabled = true;
+        }
+
         private void customRtb_TextChanged(object sender, EventArgs e)
         {
             if (_push)
@@ -106,8 +157,13 @@ namespace Notepad
 
         private void toolStrip_New_Click(object sender, EventArgs e)
         {
-            customRtb.Text = _filePath = "";
+            if (CheckModify() == DialogResult.Cancel)
+                return;
 
+            customRtb.Text = "";
+            _filePath = "Untitled";
+
+            _push = true;
             _modify = false;
             _redo.Clear();
             _undo.Clear();
@@ -135,6 +191,7 @@ namespace Notepad
                 using (StreamReader reader = new StreamReader(ofd.FileName))
                     customRtb.Text = reader.ReadToEnd();
 
+                _push = true;
                 _modify = false;
                 _redo.Clear();
                 _undo.Clear();
@@ -151,6 +208,7 @@ namespace Notepad
             using (StreamWriter writer = new StreamWriter(_filePath, false))
                 writer.Write(customRtb.Text);
 
+            _push = true;
             _modify = false;
             Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
         }
@@ -172,6 +230,7 @@ namespace Notepad
                 using (StreamWriter writer = new StreamWriter(sfd.FileName, false))
                     writer.Write(customRtb.Text);
 
+                _push = true;
                 _modify = false;
                 Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
             }
@@ -188,23 +247,23 @@ namespace Notepad
 
         private void toolStrip_Undo_Click(object sender, EventArgs e) //Ctrl + Z
         {
-            if (_undo.Count == 0)
-                return;
+            //if (_undo.Count == 0)
+            //    return;
 
-            KeyValuePair<int, string> temp = _undo.Pop();
-            _redo.Push(temp);
+            //_redo.Push(new KeyValuePair<int, string>(customRtb.SelectionStart, customRtb.Text));
+            //_push = false;
 
-            _push = false;
-            customRtb.Text = temp.Value;
-            customRtb.SelectionStart = temp.Key;
+            //KeyValuePair<int, string> temp = _undo.Pop();
+            //customRtb.Text = temp.Value;
+            //customRtb.SelectionStart = temp.Key;
 
-            if (_undo.Count == 0)
-            {
-                _modify = false;
-                Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
-            }
+            //if (_undo.Count == 0)
+            //{
+            //    _modify = false;
+            //    Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+            //}
 
-            //customRtb.Undo();
+            customRtb.Undo();
         }
 
         private void toolStrip_Redo_Click(object sender, EventArgs e) //Ctrl + Y
@@ -212,39 +271,52 @@ namespace Notepad
             //if (_redo.Count == 0)
             //    return;
 
-            //KeyValuePair<int, string> temp = _redo.Pop();
-            //_undo.Push(temp);
-
+            //_undo.Push(new KeyValuePair<int, string>(customRtb.SelectionStart, customRtb.Text));
             //_push = false;
+
+            //KeyValuePair<int, string> temp = _redo.Pop();
             //customRtb.Text = temp.Value;
             //customRtb.SelectionStart = temp.Key;
 
-            //customRtb.Redo();
+            customRtb.Redo();
         }
 
         private void toolStrip_Cut_Click(object sender, EventArgs e)
         {
-            _copy = customRtb.SelectedText;
-            _push = true;
-            int start = customRtb.SelectionStart;
-            customRtb.Text = customRtb.Text.Remove(customRtb.SelectionStart, _copy.Length);
-            customRtb.SelectionStart = start + _copy.Length;
+            if (customRtb.SelectedText == "")
+                return;
+
+            //_push = true;
+            //Clipboard.SetText(customRtb.SelectedText);
+            //int start = customRtb.SelectionStart;
+            //customRtb.Text = customRtb.Text.Remove(customRtb.SelectionStart, customRtb.SelectedText.Length);
+            //customRtb.SelectionStart = start + customRtb.SelectedText.Length;
+
+            customRtb.Cut();
         }
 
         private void toolStrip_Copy_Click(object sender, EventArgs e)
         {
-            _copy = customRtb.SelectedText;
+            if (customRtb.SelectedText == "")
+                return;
+
+            Clipboard.SetText(customRtb.SelectedText);
         }
 
         private void toolStrip_Paste_Click(object sender, EventArgs e)
         {
-            if (_copy == "")
+            if (Clipboard.GetText() == "")
                 return;
 
-            _push = true;
-            int start = customRtb.SelectionStart;
-            customRtb.Text = customRtb.Text.Insert(customRtb.SelectionStart, _copy);
-            customRtb.SelectionStart = start + _copy.Length;
+            //string copy = Clipboard.GetText();
+            //bool newLine = copy.Contains("\n");
+
+            //_push = true;
+            //int start = customRtb.SelectionStart;
+            //customRtb.Text = customRtb.Text.Insert(customRtb.SelectionStart, copy);
+            //customRtb.SelectionStart = newLine ? start + copy.Length - 2 : start + copy.Length;
+
+            customRtb.Paste();
         }
 
         private void toolStrip_SelectAll_Click(object sender, EventArgs e)
@@ -443,6 +515,26 @@ namespace Notepad
 
         #endregion
 
+        private void MakeStyle(bool nonSelection, FontStyle style, bool enable)
+        {
+            customRtb.TextChanged -= new EventHandler(customRtb_TextChanged);
+
+            if (nonSelection)
+            {
+                customRtb.Font = enable ?
+                    new Font(customRtb.Font, customRtb.Font.Style & ~style) :
+                    new Font(customRtb.Font, customRtb.Font.Style | style);
+            }
+            else
+            {
+                customRtb.SelectionFont = enable ?
+                    new Font(customRtb.SelectionFont, customRtb.SelectionFont.Style & ~style) :
+                    new Font(customRtb.SelectionFont, customRtb.SelectionFont.Style | style);
+            }
+
+            customRtb.TextChanged += new EventHandler(customRtb_TextChanged);
+        }
+
         private DialogResult CheckModify()
         {
             if (!_modify)
@@ -452,7 +544,12 @@ namespace Notepad
                 "Notepad", MessageBoxButtons.YesNoCancel, MessageBoxIcon.Question);
 
             if (result == DialogResult.Yes)
-                toolStrip_Save_Click(null, null);
+            {
+                if (_filePath == "Untitled")
+                    toolStrip_SaveAs_Click(null, null);
+                else
+                    toolStrip_Save_Click(null, null);
+            }
 
             return result;
         }

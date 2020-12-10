@@ -205,12 +205,17 @@ namespace Notepad
             if (_filePath == "")
                 return;
 
-            using (StreamWriter writer = new StreamWriter(_filePath, false))
-                writer.Write(customRtb.Text);
+            if (_filePath == "Untitled")
+                toolStrip_SaveAs_Click(null, null);
+            else
+            {
+                using (StreamWriter writer = new StreamWriter(_filePath, false))
+                    writer.Write(customRtb.Text);
 
-            _push = true;
-            _modify = false;
-            Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+                _push = true;
+                _modify = false;
+                Text = Path.GetFileNameWithoutExtension(_filePath) + " - Notepad";
+            }
         }
 
         private void toolStrip_SaveAs_Click(object sender, EventArgs e)
